@@ -25,8 +25,13 @@ class Transaction {
   }
 
   commit() {
-    this.time = new Date();
-    this.account.addTransaction(this)
+    if(this.isAllowed()) {
+      this.time = new Date();
+      this.account.addTransaction(this)
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
@@ -34,12 +39,23 @@ class Withdrawal extends Transaction {
   get value() {
     return -this.amount;
   }
+
+  isAllowed() {
+    if(this.amount > this.account.balance) {
+      return false
+    }
+    return true;
+  }
 }
 
 class Deposit extends Transaction {
-
   get value() {
     return this.amount;
+  }
+
+  isAllowed() {
+    // deposits always allowed thanks to capitalism.
+    return true;
   }
 }
 
@@ -49,8 +65,9 @@ const myAccount = new Account('billybob');
 
 
 const t1 = new Deposit(120.00, myAccount);
+const t2 = new Withdrawal(500.00, myAccount);
 t1.commit();
-const t2 = new Withdrawal(50.00, myAccount);
-t2.commit();
+console.log('Transaction Result: ', t2.commit())
 
-console.log('Ending Balance:', myAccount.balance);
+
+
